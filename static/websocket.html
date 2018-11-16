@@ -1,0 +1,54 @@
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+        <title>client of web socket</title>
+    </head>
+    <body>
+        <form onsubmit="return false">
+            <input type="text" name="message" value="">
+            <br/><br/><br/>
+            <input type="button" value="send web socket request message" onClick="send(this.form.message.value)">
+            <hr color="red"/>
+            <h2>Reply message returned by server</h2>
+            <textarea id="responseContent" style="width: 1024px; height: 300px"></textarea>
+        </form>
+
+        <script type="text/javascript">
+            var socket;
+            if(!window.WebSocket) {
+                window.WebSocket = window.MozWebSocket;
+            }
+
+            if(window.WebSocket) {
+                socket = new WebSocket('ws://localhost:8888/websocket');
+                socket.onmessage = function (ev) {
+                    var ta = document.getElementById('responseContent');
+                    ta.value += ev.data + "\r\n"
+                }
+                socket.onopen = function (ev) {
+                    var ta = document.getElementById('responseContent');
+                    ta.value = 'Your current browser supports WebSocket, Please follow up\r\n';
+
+                }
+                socket.onclose = function (ev) {
+                    var ta = document.getElementById('responseContent');
+                    ta.value = '';
+                    ta.value = 'WebSocket connection is closed'
+                }
+            } else {
+                alert('Your browser does not support WebSocket')
+            }
+
+            function send(message) {
+                if(!window.WebSocket) {
+                    return;
+                }
+                if(socket.readyState === WebSocket.OPEN) {
+                    socket.send(message)
+                } else {
+                    alert('WebSocket connection creation failed!')
+                }
+            }
+        </script>
+    </body>
+</html>
